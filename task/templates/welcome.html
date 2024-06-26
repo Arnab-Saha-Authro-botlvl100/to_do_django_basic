@@ -1,0 +1,160 @@
+{% extends "dashboard_base.html" %}
+{% block start %}
+    
+    <div class="container">
+        <h2>Welcome!</h2>
+        <p>You have successfully registered. Enjoy using the app!</p>
+    </div>
+    {% if messages %}
+        <div class="container mt-3">
+            {% for message in messages %}
+                <div class="alert {% if message.tags %}alert-{{ message.tags }}{% else %}alert-info{% endif %}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+
+
+    <div class="d-flex container justify-content-between">
+            <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                Add Task
+            </button>
+            <button type="button" class="btn btn-secondary">Button 2</button>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog  modal-lg">
+            <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Add Task</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+            <section class="vh-100 bg-image"
+                    style="background-image: url('https://mdbcdn.b-cdn.net/img/Photos/new-templates/search-box/img4.webp');">
+                    <div class="mask d-flex align-items-center h-100 gradient-custom-3">
+                        <div class="container h-100">
+                        <div class="row d-flex justify-content-center align-items-center h-100">
+                            <div class="col-12 col-md-12 col-lg-12 col-xl-12">
+                            <div class="card" style="border-radius: 15px;">
+                                <div class="card-body p-5">
+                                <h2 class="text-uppercase text-center mb-5">Add New Task</h2>
+
+                                <form action="{% url 'add_task' %}" method="POST">
+                                    {% csrf_token %}
+                                    <div class="form-group">
+                                        <label for="task_name">Task Name</label>
+                                        <input type="text" class="form-control" id="task_name" name="task_name" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="task_description">Task Description</label>
+                                        <input type="text" class="form-control" id="task_description" name="task_description" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="due_date">Due Date</label>
+                                        <input type="date" class="form-control" id="due_date" name="due_date" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="priority">Priority</label>
+                                        <select class="form-control" id="priority" name="priority">
+                                            <option value="High">High</option>
+                                            <option value="Medium">Medium</option>
+                                            <option value="Low">Low</option>
+                                        </select>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary mt-3">Add Task</button>
+                                </form>
+
+
+                                </div>
+                            </div>
+                            </div>
+                        </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+            
+            </div>
+        </div>
+    </div>
+
+   <div class="mt-3 container">
+        <h2>Your Tasks</h2>
+        <form method="POST" action="{% url 'update_tasks' %}">
+            {% csrf_token %}
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th scope="col">SL NO</th>
+                        <th scope="col">Title</th>
+                        <th scope="col">Description</th>
+                        <th scope="col">Due Date</th>
+                        <th scope="col">Priority</th>
+                        <th scope="col">Completed</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for task in tasks %}
+                        <tr>
+                            <th scope="row">{{ forloop.counter }}</th>
+                            <td>{{ task.title }}</td>
+                            <td>
+                                <input type="text" name="description_{{ task.id }}" value="{{ task.description }}" class="form-control">
+                            </td>
+                            <td>
+                                <input type="date" name="due_date_{{ task.id }}" value="{{ task.due_date|date:'Y-m-d' }}" class="form-control">
+                            </td>
+                            <td>{{ task.priority }}</td>
+                            <td>
+                                <input type="checkbox" name="completed_tasks" value="{{ task.id }}" {% if task.completed %}checked{% endif %}>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <button type="submit" class="btn btn-primary">Update Tasks</button>
+        </form>
+
+   </div>
+
+
+    <div class="mt-3 container">
+         <h2>Completed Tasks</h2>
+            {% comment %} <form method="POST" action="{% url 'update_tasks' %}">
+                {% csrf_token %} {% endcomment %}
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th scope="col">SL NO</th>
+                            <th scope="col">Title</th>
+                            <th scope="col">Description</th>
+                            <th scope="col">Due Date</th>
+                            <th scope="col">Priority</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for task in completed_tasks %}
+                            <tr>
+                                <th scope="row">{{ forloop.counter }}</th>
+                                <td>{{ task.title }}</td>
+                                <td>
+                                    {{ task.description }}
+                                </td>
+                                <td>
+                                    {{ task.due_date }}
+                                </td>
+                                {% comment %} <td>{{ task.due_date }}</td> {% endcomment %}
+                                <td>{{ task.priority }}</td>
+                                
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <button type="submit" class="btn btn-primary">Update Tasks</button>
+            {% comment %} </form> {% endcomment %}
+    </div>
+{% endblock %}
